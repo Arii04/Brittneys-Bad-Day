@@ -10,7 +10,7 @@ int main(int argc, char* argv[])
 	app.OpenWindow(800, 600, "World scroller");
 	//app.OpenFullScreen(800, 600, 24);
 	//app.OpenConsole();
-	app.SetClearColor(CColor::LightBlue());
+	app.SetClearColor(CColor::LightGray());
 	app.Run(&game);
 	return(0);
 }

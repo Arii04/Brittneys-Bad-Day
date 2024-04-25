@@ -16,6 +16,9 @@ class CMyGame : public CGame
 	CSoundPlayer jeremys;
 	CSoundPlayer bolts;
 	CSprite health;
+	CSpriteList GF;
+	
+	int maxGF = 3;
 	int offset = 0;
 	int noEnemies = 0;
 	int maxenemies = 5;

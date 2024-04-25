@@ -31,7 +31,7 @@ void CMyGame::OnUpdate()
 	for (CSprite* aterry : terryList)
 	{
 
-		aterry->SetRotation(player.GetX() - aterry->GetX() , player.GetX() - aterry->GetY());
+		aterry->SetRotation(player.GetX() - aterry->GetX() , player.GetY() - aterry->GetY());
 		
 		if (rand() % 60 == 0 && IsGameOver() == false)
 		{
@@ -52,6 +52,16 @@ void CMyGame::OnUpdate()
 	aterry->Update(t);
 	}
 		
+
+	
+	
+	for (CSprite* aGF : GF)
+	{
+		aGF->Update(t);
+	}
+
+
+
 	for (CSprite* aink : inkList) aink->Update(t);
 	//bolt update
 	for (CSprite* abolt : boltList) abolt->Update(t);
@@ -139,6 +149,28 @@ void CMyGame::OnUpdate()
 	}
 	
 	
+	for (CSprite* aGF : GF)
+	{
+		if (player.HitTest(aGF))
+		{
+			
+			player.SetX(rand()%1600 - 200);
+			player.SetY(rand()%1200 - 200);
+			
+		}
+		for (CSprite* ajeremy : jeremyList)
+		{
+			if (ajeremy->HitTest(aGF))
+			{
+				ajeremy->SetY(rand() % 1200 - 200);
+				ajeremy->SetX(rand() % 1600 - 200);
+
+			}
+		}
+
+	}
+
+
 	//player collison
 	for (CSprite* ajeremy : jeremyList)
 	{
@@ -190,6 +222,7 @@ void CMyGame::OnUpdate()
 	jeremyList.delete_if(deleted);
 	inkList.delete_if(deleted);
 	terryList.delete_if(deleted);
+	GF.delete_if(deleted);
 	//spawner
 	
 	
@@ -215,7 +248,12 @@ void CMyGame::OnUpdate()
 			noEnemies += 1;
 		}
 		
+		
+		
+		
 	}
+
+
 	if (noEnemies == maxenemies)
 	{
 			full = true;
@@ -224,11 +262,20 @@ void CMyGame::OnUpdate()
 	if ((noEnemies == 0) && (full == true))
 	{
 			full = false;
+			GF.delete_all();
 			maxenemies += 2;
 			round += 1;
 			EdmgMult = EdmgMult + ((rand() % 3 + 1)/10);
 			score = score + 100;
 			if (IsGameOver() == false) Krabs();
+			for (int i = 0; i < maxGF; i++) 
+			{
+			CSprite* aGF = new CSprite(rand() % 1400 + 200, rand() % 700 + 300, 0, 0, GetTime());
+			aGF->AddImage("Gravitational Field.bmp", "GF", 4, 1, 0, 0, 2, 0, CColor::White());
+			aGF->SetAnimation("GF", 7);
+			aGF->SetOmega(800);
+			GF.push_back(aGF);
+			}
 	}
 
 	//sound
@@ -338,7 +385,8 @@ void CMyGame::OnDraw(CGraphics* g)
 	g->SetScrollPos(scrollpos);
 	
 	gameworld.Draw(g);
-
+   //draw Gravitaional Fields
+	for (CSprite* aGF : GF) aGF->Draw(g); 
 	player.Draw(g);
 
 	 //draw bolts
@@ -350,6 +398,7 @@ void CMyGame::OnDraw(CGraphics* g)
 	for (CSprite* aterry : terryList)aterry->Draw(g);
 	//draw ink
 	for (CSprite* aink : inkList) aink->Draw(g);
+	
 	 // don't scroll anything drawn thereafter
 	 g->SetScrollPos(0, 0);
 
@@ -367,10 +416,10 @@ void CMyGame::OnDraw(CGraphics* g)
 	health.SetPosition(30, 570);
 		health.Draw(g);
 	 *g << font(28) << color(CColor::Red()) << xy(65, 570) << ": " << player.GetHealth();
-	 if (IsGameOverMode())  *g << font(40) << color(CColor::Red()) << xy(200, 300) << "Her hair got messed up";
-	 if (IsGameOverMode())  *g << font(40) << color(CColor::Magenta()) << xy(250, 250) << "Final score is :" << score;
-	 if (IsGameOverMode() && hardM== true)  *g << font(40) << color(CColor::Blue()) << xy(250, 220) << "Hard Mode was active";
-	 if (IsGameOverMode())  *g << font(40) << color(CColor::Green()) << xy(200, 150) << "Press F2 to try beat your score:" ;
+	 if (IsGameOverMode())  *g << font(40) << color(CColor::Red()) << xy(150, 300) << "The Invasion was Withheld for now";
+	 if (IsGameOverMode())  *g << font(40) << color(CColor::Magenta()) << xy(150, 250) << "Final score is :" << score;
+	 if (IsGameOverMode() && hardM== true)  *g << font(40) << color(CColor::Blue()) << xy(150, 220) << "Final Defense Mode was active";
+	 if (IsGameOverMode())  *g << font(40) << color(CColor::Green()) << xy(150, 150) << "Press F2 to begin the invasion once more " ;
 	
 	 
 	 //draw when round over
@@ -636,6 +685,7 @@ void CMyGame::OnLButtonDown(Uint16 x,Uint16 y)
 
 	if (IsGameOver() == false) 
 	{
+		
 		CSprite* abolt = new CSprite(player.GetX(), player.GetY(), 0, 0, GetTime());
 		abolt->AddImage("lightning.bmp", "bolt", 3, 1, 0, 0, 2, 0, CColor::Blue());
 		abolt->SetAnimation("bolt", 7);
@@ -690,6 +740,7 @@ void CMyGame::Krabs()
 
 void CMyGame::hard()
 {
+	maxGF = maxGF + round;
 	for (CSprite* aink : inkList)
 	{
 		if (aink->GetX() < 0) aink->SetX(1920);
